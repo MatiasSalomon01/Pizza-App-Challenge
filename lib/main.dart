@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Pizza App Challenge',
       home: const HomeScreen(),
+      // home: PizzaSelectionPage(),
       theme: ThemeData(
         textTheme: const TextTheme(
           titleLarge: TextStyle(color: Colors.brown),

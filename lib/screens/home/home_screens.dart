@@ -14,7 +14,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    controller = PageController(viewportFraction: .5);
+    controller = PageController(viewportFraction: .5)
+      ..addListener(() {
+        setState(() {});
+      });
   }
 
   @override
@@ -56,36 +59,49 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 50,
-              child: Image.asset(
-                "assets/dish.png",
-                height: 190,
+            Container(
+              margin: const EdgeInsets.only(left: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              decoration: BoxDecoration(
+                  color: Colors.amber, borderRadius: BorderRadius.circular(50)),
+              child: Text(
+                'Pizza',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w900),
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Stack(
               children: [
-                Container(
-                  margin: const EdgeInsets.only(left: 15),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                  decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(50)),
-                  child: Text(
-                    'Pizza',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w900),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 50,
+                  child: Image.asset(
+                    "assets/dish.png",
+                    height: 215,
                   ),
                 ),
-                Expanded(
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 12,
+                  child: Transform.rotate(
+                    angle: !controller.hasClients
+                        ? 0
+                        : controller.page! * .5 * 3.14159265359,
+                    child: Image.asset(
+                      "assets/circle-salad.png",
+                      height: 300,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * .8,
                   child: PageView.builder(
                     controller: controller,
                     itemCount: 9,
@@ -110,24 +126,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           // Calcula el desplazamiento Y
                           double verticalOffset =
-                              (1 - value.abs()).clamp(0.0, 1.0) * -220;
+                              (1 - value.abs()).clamp(0.0, 1.0) *
+                                  -MediaQuery.of(context).size.height *
+                                  .207;
 
                           return Transform.scale(
-                            scale: (1 - value.abs()).clamp(0.5, 3),
+                            scale: (1 - value.abs()).clamp(.5, 1),
                             child: Transform.translate(
                               offset: Offset(0, verticalOffset),
                               child: Transform.rotate(
-                                angle: value * 2 * 3.14159265359,
+                                angle: value * .5 * 3.14159265359,
                                 child: child,
                               ),
                             ),
                           );
                         },
                         child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          // margin: const EdgeInsets.symmetric(horizontal: 10),
+                          // margin: EdgeInsets.only(top: 120),
                           decoration: BoxDecoration(
                             // color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
+                            // borderRadius: BorderRadius.circular(20),
                             image: DecorationImage(
                               image: AssetImage("assets/pizza-$index.png"),
                               fit: BoxFit.contain,
