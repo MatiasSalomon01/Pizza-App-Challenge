@@ -1,4 +1,6 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:pizza_app_challenge/models/pizza_item.dart';
 import 'package:pizza_app_challenge/utils/custom_page_view_scroll_physics.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,10 +10,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late final PageController controller;
+  late final AnimationController dataController;
   int currentIndex = 0;
-
+  bool animate = true;
   @override
   void initState() {
     super.initState();
@@ -19,6 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ..addListener(() {
         setState(() {});
       });
+    // dataController =
+    //     AnimationController(vsync: this, duration: Duration(microseconds: 400))
+    //       ..addListener(() {
+    //         setState(() {});
+    //       });
   }
 
   @override
@@ -93,7 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: MediaQuery.of(context).size.height * .45,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(
+                                color: Colors.black87.withOpacity(.1)),
                             borderRadius: const BorderRadius.vertical(
                               bottom: Radius.circular(200),
                             ),
@@ -181,7 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     controller: controller,
                     itemCount: 9,
                     onPageChanged: (value) {
-                      setState(() => currentIndex = value);
+                      setState(() {
+                        currentIndex = value;
+                        animate = true;
+                      });
                     },
                     itemBuilder: (context, index) {
                       return AnimatedBuilder(
@@ -232,93 +245,122 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * .56,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Pizza',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w500),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          5,
-                          (index) => const Icon(
-                            Icons.star,
-                            color: Color(0xffDC9639),
-                            size: 15,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '\$12',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold, fontSize: 35),
-                      ),
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            style: const ButtonStyle(
-                              shape: WidgetStatePropertyAll(CircleBorder()),
-                              elevation: WidgetStatePropertyAll(0),
-                              overlayColor:
-                                  WidgetStatePropertyAll(Colors.transparent),
-                              backgroundColor:
-                                  WidgetStatePropertyAll(Colors.white),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              'S',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: const ButtonStyle(
-                              shape: WidgetStatePropertyAll(CircleBorder()),
-                              elevation: WidgetStatePropertyAll(5),
-                              overlayColor:
-                                  WidgetStatePropertyAll(Colors.transparent),
-                              backgroundColor:
-                                  WidgetStatePropertyAll(Colors.white),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              'M',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: const ButtonStyle(
-                              shape: WidgetStatePropertyAll(CircleBorder()),
-                              elevation: WidgetStatePropertyAll(0),
-                              overlayColor:
-                                  WidgetStatePropertyAll(Colors.transparent),
-                              backgroundColor:
-                                  WidgetStatePropertyAll(Colors.white),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              'L',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                Details(item: PizzaItem.mock[currentIndex]),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class Details extends StatelessWidget {
+  const Details({
+    super.key,
+    required this.item,
+  });
+
+  final PizzaItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * .56,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FadeIn(
+            child: Text(
+              item.name,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (index) {
+              var rating = item.rating;
+
+              // Determina el tipo de estrella a mostrar
+              IconData icon;
+              if (index < rating.floor()) {
+                // Estrella completa
+                icon = Icons.star;
+              } else if (index < rating && rating - index == 0.5) {
+                // Estrella media
+                icon = Icons.star_half;
+              } else {
+                // Estrella vacía
+                icon = Icons.star_border;
+              }
+
+              return Icon(
+                icon,
+                color: const Color(0xffDC9639),
+                size: 15,
+              );
+            }),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            '\$${item.price}',
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold, fontSize: 35),
+          ),
+          const SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: const ButtonStyle(
+                  shape: WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(0),
+                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                ),
+                onPressed: () {
+                  // dataController.reverse();
+                  // dataController.forward();
+                },
+                child: Text(
+                  'S',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              ElevatedButton(
+                style: const ButtonStyle(
+                  shape: WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(5),
+                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                ),
+                onPressed: () {},
+                child: Text(
+                  'M',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              ElevatedButton(
+                style: const ButtonStyle(
+                  shape: WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(0),
+                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                ),
+                onPressed: () {},
+                child: Text(
+                  'L',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
