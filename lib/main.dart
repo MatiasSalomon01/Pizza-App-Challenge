@@ -14,6 +14,8 @@ class MyApp extends StatelessWidget {
       home: const HomeScreen(),
       // home: PizzaSelectionPage(),
       theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xfff9f7f2),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xfff9f7f2)),
         textTheme: const TextTheme(
           titleLarge: TextStyle(color: Colors.brown),
           titleMedium: TextStyle(color: Colors.brown),
