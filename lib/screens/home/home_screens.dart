@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_app_challenge/utils/custom_page_view_scroll_physics.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -103,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * .8,
                   child: PageView.builder(
+                    physics: const CustomPageViewScrollPhysics(),
                     controller: controller,
                     itemCount: 9,
                     onPageChanged: (value) {
