@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_app_challenge/screens/home/home_screens.dart';
+import 'package:pizza_app_challenge/screens/home_screens.dart';
 
 void main() => runApp(const MyApp());
 

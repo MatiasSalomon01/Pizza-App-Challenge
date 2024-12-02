@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:pizza_app_challenge/models/pizza_item.dart';
+import 'package:pizza_app_challenge/screens/details_screen.dart';
 import 'package:pizza_app_challenge/utils/custom_page_view_scroll_physics.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -97,17 +98,20 @@ class _HomeScreenState extends State<HomeScreen>
                     height: MediaQuery.of(context).size.height * .47,
                     child: Stack(
                       children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width * .25),
-                          height: MediaQuery.of(context).size.height * .45,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                                color: Colors.black87.withOpacity(.1)),
-                            borderRadius: const BorderRadius.vertical(
-                              bottom: Radius.circular(200),
+                        Hero(
+                          tag: 'background',
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * .25),
+                            height: MediaQuery.of(context).size.height * .45,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                  color: Colors.black87.withOpacity(.1)),
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(200),
+                              ),
                             ),
                           ),
                         ),
@@ -151,9 +155,12 @@ class _HomeScreenState extends State<HomeScreen>
                   left: 0,
                   right: 0,
                   top: 50,
-                  child: Image.asset(
-                    "assets/dish.png",
-                    height: 215,
+                  child: Hero(
+                    tag: 'plate',
+                    child: Image.asset(
+                      "assets/dish.png",
+                      height: 215,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -231,15 +238,26 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           );
                         },
-                        child: Container(
-                          // margin: const EdgeInsets.symmetric(horizontal: 10),
-                          // margin: EdgeInsets.only(top: 120),
-                          decoration: BoxDecoration(
-                            // color: Colors.red,
-                            // borderRadius: BorderRadius.circular(20),
-                            image: DecorationImage(
-                              image: AssetImage("assets/pizza-$index.png"),
-                              fit: BoxFit.contain,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailsScreen(
+                                    index: currentIndex,
+                                    item: PizzaItem.mock[currentIndex]),
+                              ),
+                            );
+                          },
+                          child: Hero(
+                            tag: 'pizza-$index',
+                            child: Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage("assets/pizza-$index.png"),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
                             ),
                           ),
                         ),
