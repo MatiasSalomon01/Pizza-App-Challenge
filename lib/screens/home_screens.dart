@@ -119,31 +119,34 @@ class _HomeScreenState extends State<HomeScreen>
                           bottom: 0,
                           left: MediaQuery.of(context).size.width * .44,
                           right: MediaQuery.of(context).size.width * .44,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 15,
-                                    offset: Offset(0, 10),
-                                    spreadRadius: -4,
-                                    color: Color(0xfff17e3a),
-                                    // color: Colors.red,
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.circular(8),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xffedc75b),
-                                    Color(0xfff17e3a)
+                          child: Hero(
+                            tag: 'cart',
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      blurRadius: 15,
+                                      offset: Offset(0, 10),
+                                      spreadRadius: -4,
+                                      color: Color(0xfff17e3a),
+                                      // color: Colors.red,
+                                    ),
                                   ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                )),
-                            child: Image.asset(
-                              "assets/cart.png",
-                              height: 30,
-                              color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xffedc75b),
+                                      Color(0xfff17e3a)
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  )),
+                              child: Image.asset(
+                                "assets/cart.png",
+                                height: 30,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -275,22 +278,13 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-class Details extends StatefulWidget {
+class Details extends StatelessWidget {
   const Details({
     super.key,
     required this.item,
   });
 
   final PizzaItem item;
-
-  @override
-  State<Details> createState() => _DetailsState();
-}
-
-class _DetailsState extends State<Details> {
-  bool isSmall = false;
-  bool isMedium = true;
-  bool isLarge = false;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -299,11 +293,11 @@ class _DetailsState extends State<Details> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FadeInUp(
-            key: ValueKey(widget.item.name),
+            key: ValueKey(item.name),
             from: 10,
             duration: const Duration(milliseconds: 200),
             child: Text(
-              widget.item.name,
+              item.name,
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
@@ -311,7 +305,7 @@ class _DetailsState extends State<Details> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
-              var rating = widget.item.rating;
+              var rating = item.rating;
 
               // Determina el tipo de estrella a mostrar
               IconData icon;
@@ -334,76 +328,99 @@ class _DetailsState extends State<Details> {
             }),
           ),
           FadeInUp(
-            key: ValueKey('${widget.item.name}-price'),
+            key: ValueKey('${item.name}-price'),
             from: 10,
             duration: const Duration(milliseconds: 200),
-            child: Text(
-              '\$${widget.item.price}',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontSize: 40, fontFamily: 'RozhaOne'),
+            child: Hero(
+              tag: '${item.name}-price',
+              child: Text(
+                '\$${item.price}',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontSize: 40, fontFamily: 'RozhaOne'),
+              ),
             ),
           ),
           const SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                style: ButtonStyle(
-                  shape: const WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(isSmall ? 5 : 0),
-                  overlayColor:
-                      const WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
-                ),
-                onPressed: () => setState(() {
-                  isSmall = true;
-                  isMedium = false;
-                  isLarge = false;
-                }),
-                child: Text(
-                  'S',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
+          const Buttons()
+        ],
+      ),
+    );
+  }
+}
+
+class Buttons extends StatefulWidget {
+  const Buttons({super.key});
+
+  @override
+  State<Buttons> createState() => _ButtonsState();
+}
+
+class _ButtonsState extends State<Buttons> {
+  bool isSmall = false;
+  bool isMedium = true;
+  bool isLarge = false;
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: 'buttons',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            // height: 33,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                shape: const WidgetStatePropertyAll(CircleBorder()),
+                elevation: WidgetStatePropertyAll(isSmall ? 5 : 0),
+                overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+                backgroundColor: const WidgetStatePropertyAll(Colors.white),
               ),
-              ElevatedButton(
-                style: ButtonStyle(
-                  shape: const WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(isMedium ? 5 : 0),
-                  overlayColor:
-                      const WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
-                ),
-                onPressed: () => setState(() {
-                  isSmall = false;
-                  isMedium = true;
-                  isLarge = false;
-                }),
-                child: Text(
-                  'M',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
+              onPressed: () => setState(() {
+                isSmall = true;
+                isMedium = false;
+                isLarge = false;
+              }),
+              child: Text(
+                'S',
+                style: Theme.of(context).textTheme.titleSmall,
               ),
-              ElevatedButton(
-                style: ButtonStyle(
-                  shape: const WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(isLarge ? 5 : 0),
-                  overlayColor:
-                      const WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
-                ),
-                onPressed: () => setState(() {
-                  isSmall = false;
-                  isMedium = false;
-                  isLarge = true;
-                }),
-                child: Text(
-                  'L',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-            ],
+            ),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              shape: const WidgetStatePropertyAll(CircleBorder()),
+              elevation: WidgetStatePropertyAll(isMedium ? 5 : 0),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              backgroundColor: const WidgetStatePropertyAll(Colors.white),
+            ),
+            onPressed: () => setState(() {
+              isSmall = false;
+              isMedium = true;
+              isLarge = false;
+            }),
+            child: Text(
+              'M',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              shape: const WidgetStatePropertyAll(CircleBorder()),
+              elevation: WidgetStatePropertyAll(isLarge ? 5 : 0),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              backgroundColor: const WidgetStatePropertyAll(Colors.white),
+            ),
+            onPressed: () => setState(() {
+              isSmall = false;
+              isMedium = false;
+              isLarge = true;
+            }),
+            child: Text(
+              'L',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
           ),
         ],
       ),
