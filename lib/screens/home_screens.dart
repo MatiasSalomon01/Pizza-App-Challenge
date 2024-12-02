@@ -152,18 +152,6 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 50,
-                  child: Hero(
-                    tag: 'plate',
-                    child: Image.asset(
-                      "assets/dish.png",
-                      height: 215,
-                    ),
-                  ),
-                ),
-                Positioned(
                   left: MediaQuery.of(context).size.width * .38,
                   right: MediaQuery.of(context).size.width * .38,
                   top: 230,
@@ -176,6 +164,18 @@ class _HomeScreenState extends State<HomeScreen>
                           spreadRadius: 5,
                         ),
                       ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 50,
+                  child: Hero(
+                    tag: 'plate',
+                    child: Image.asset(
+                      "assets/dish.png",
+                      height: 215,
                     ),
                   ),
                 ),
