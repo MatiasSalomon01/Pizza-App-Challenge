@@ -45,9 +45,11 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             Text(
               'Order Mannually',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontFamily: 'Header', fontSize: 35),
             ),
-            const SizedBox(height: 5),
             Row(
               children: [
                 const Icon(Icons.pin_drop, size: 15, color: Colors.brown),
@@ -79,10 +81,10 @@ class _HomeScreenState extends State<HomeScreen>
                   color: Colors.amber, borderRadius: BorderRadius.circular(50)),
               child: Text(
                 'Pizza',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w900),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: .5,
+                    fontFamily: 'Impact'),
               ),
             ),
             Stack(
@@ -255,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-class Details extends StatelessWidget {
+class Details extends StatefulWidget {
   const Details({
     super.key,
     required this.item,
@@ -264,25 +266,34 @@ class Details extends StatelessWidget {
   final PizzaItem item;
 
   @override
+  State<Details> createState() => _DetailsState();
+}
+
+class _DetailsState extends State<Details> {
+  bool isSmall = false;
+  bool isMedium = true;
+  bool isLarge = false;
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * .56,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FadeIn(
+          FadeInUp(
+            key: ValueKey(widget.item.name),
+            from: 10,
+            duration: const Duration(milliseconds: 200),
             child: Text(
-              item.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.w500),
+              widget.item.name,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
+          const SizedBox(height: 3),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(5, (index) {
-              var rating = item.rating;
+              var rating = widget.item.rating;
 
               // Determina el tipo de estrella a mostrar
               IconData icon;
@@ -304,55 +315,71 @@ class Details extends StatelessWidget {
               );
             }),
           ),
-          const SizedBox(height: 5),
-          Text(
-            '\$${item.price}',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold, fontSize: 35),
+          FadeInUp(
+            key: ValueKey('${widget.item.name}-price'),
+            from: 10,
+            duration: const Duration(milliseconds: 200),
+            child: Text(
+              '\$${widget.item.price}',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontSize: 40, fontFamily: 'RozhaOne'),
+            ),
           ),
           const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                style: const ButtonStyle(
-                  shape: WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(0),
-                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                style: ButtonStyle(
+                  shape: const WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(isSmall ? 5 : 0),
+                  overlayColor:
+                      const WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
                 ),
-                onPressed: () {
-                  // dataController.reverse();
-                  // dataController.forward();
-                },
+                onPressed: () => setState(() {
+                  isSmall = true;
+                  isMedium = false;
+                  isLarge = false;
+                }),
                 child: Text(
                   'S',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               ElevatedButton(
-                style: const ButtonStyle(
-                  shape: WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(5),
-                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                style: ButtonStyle(
+                  shape: const WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(isMedium ? 5 : 0),
+                  overlayColor:
+                      const WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
                 ),
-                onPressed: () {},
+                onPressed: () => setState(() {
+                  isSmall = false;
+                  isMedium = true;
+                  isLarge = false;
+                }),
                 child: Text(
                   'M',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               ElevatedButton(
-                style: const ButtonStyle(
-                  shape: WidgetStatePropertyAll(CircleBorder()),
-                  elevation: WidgetStatePropertyAll(0),
-                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
-                  backgroundColor: WidgetStatePropertyAll(Colors.white),
+                style: ButtonStyle(
+                  shape: const WidgetStatePropertyAll(CircleBorder()),
+                  elevation: WidgetStatePropertyAll(isLarge ? 5 : 0),
+                  overlayColor:
+                      const WidgetStatePropertyAll(Colors.transparent),
+                  backgroundColor: const WidgetStatePropertyAll(Colors.white),
                 ),
-                onPressed: () {},
+                onPressed: () => setState(() {
+                  isSmall = false;
+                  isMedium = false;
+                  isLarge = true;
+                }),
                 child: Text(
                   'L',
                   style: Theme.of(context).textTheme.titleSmall,
