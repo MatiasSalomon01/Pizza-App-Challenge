@@ -1,12 +1,34 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:pizza_app_challenge/models/pizza_item.dart';
 import 'package:pizza_app_challenge/models/topping.dart';
 import 'package:pizza_app_challenge/screens/home_screens.dart';
 
-class DetailsScreen extends StatelessWidget {
+class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key, required this.index, required this.item});
   final int index;
   final PizzaItem item;
+
+  @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  List<Widget> ingredients = [];
+  GlobalKey stackKey = GlobalKey();
+  Offset getRelativeOffset(Offset globalOffset) {
+    final RenderBox stackBox =
+        stackKey.currentContext?.findRenderObject() as RenderBox;
+
+    return stackBox.globalToLocal(globalOffset);
+  }
+
+  int price = 0;
+  @override
+  void initState() {
+    super.initState();
+    price = widget.item.price;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +37,7 @@ class DetailsScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.brown),
         centerTitle: true,
         title: Text(
-          item.name,
+          widget.item.name,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 30),
         ),
       ),
@@ -122,27 +144,65 @@ class DetailsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Hero(
-                    tag: 'pizza-$index',
-                    child: Container(
-                      height: 230,
-                      margin: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage("assets/pizza-$index.png"),
-                          fit: BoxFit.contain,
-                        ),
+                    tag: 'pizza-${widget.index}',
+                    child: DragTarget(
+                      onAcceptWithDetails: (data) {
+                        Offset localOffset = getRelativeOffset(data.offset);
+                        var asd = MediaQuery.of(context).size.width * .25;
+                        var asdd = MediaQuery.of(context).size.width * .65;
+                        if (asd <= localOffset.dx && localOffset.dx <= asdd) {
+                          var left = localOffset.dx - 5;
+                          var top = localOffset.dy - 5;
+                          var asd = Positioned(
+                            left: left,
+                            top: top,
+                            child: SizedBox(
+                              height: 30,
+                              child: Image.asset(
+                                Topping.mock[data.data as int].imageUrl,
+                                fit: BoxFit.fitWidth,
+                              ),
+                            ),
+                          );
+                          ingredients.add(asd);
+                          price += Topping.mock[data.data as int].price;
+                          setState(() {});
+                        }
+                      },
+                      builder: (context, candidateData, rejectedData) => Stack(
+                        key: stackKey,
+                        children: [
+                          Container(
+                            height: 230,
+                            margin: const EdgeInsets.only(top: 12),
+                            decoration: BoxDecoration(
+                              // color: Colors.red,
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    "assets/pizza-${widget.index}.png"),
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          ...ingredients,
+                        ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Hero(
-                    tag: '${item.name}-price',
-                    child: Text(
-                      '\$${item.price}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontSize: 40, fontFamily: 'RozhaOne'),
+                  FadeInUp(
+                    key: ValueKey('$price'),
+                    from: 10,
+                    duration: const Duration(milliseconds: 200),
+                    child: Hero(
+                      tag: '${widget.item.name}-price',
+                      child: Text(
+                        '\$$price',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontSize: 40, fontFamily: 'RozhaOne'),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -153,29 +213,41 @@ class DetailsScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 25),
-                  Container(
-                    height: 50,
-                    margin: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * .1),
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: Topping.mock.length,
-                      itemBuilder: (context, index) => Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xfff9f7f2),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.black87.withOpacity(.1),
+                  SlideInUp(
+                    duration: const Duration(milliseconds: 500),
+                    // from: 1000,
+                    child: Container(
+                      height: 50,
+                      margin: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * .1),
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: Topping.mock.length,
+                        itemBuilder: (context, index) => Draggable(
+                          data: index,
+                          feedback: Image.asset(
+                            Topping.mock[index].imageUrl,
+                            fit: BoxFit.fitHeight,
+                            height: 30,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xfff9f7f2),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.black87.withOpacity(.1),
+                              ),
+                            ),
+                            child: Image.asset(
+                              Topping.mock[index].imageUrl,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        child: Image.asset(
-                          Topping.mock[index].imageUrl,
-                          fit: BoxFit.cover,
-                        ),
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const SizedBox(width: 10),
                       ),
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const SizedBox(width: 10),
                     ),
                   ),
                 ],
